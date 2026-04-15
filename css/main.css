@@ -1,0 +1,173 @@
+/* ═══════════════════════════════════════════════════════════
+   main.css — Variables globales, reset y estilos base
+   Tema: cine oscuro (negro / rojo / dorado)
+═══════════════════════════════════════════════════════════ */
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  /* Colores */
+  --color-bg:          #0a0a0a;
+  --color-surface:     #141414;
+  --color-surface-2:   #1f1f1f;
+  --color-surface-3:   #2a2a2a;
+  --color-border:      #2e2e2e;
+
+  --color-primary:     #e50914;   /* rojo Netflix */
+  --color-primary-h:   #ff1a28;
+  --color-accent:      #f5c518;   /* dorado IMDb  */
+  --color-accent-dim:  #c9a20f;
+
+  --color-text:        #e5e5e5;
+  --color-text-muted:  #888;
+  --color-text-dim:    #555;
+
+  --color-success:     #46d369;
+  --color-error:       #ff4444;
+  --color-warning:     #f5c518;
+  --color-info:        #5bc0de;
+
+  /* Tipografía */
+  --font-main:   'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono:   'Courier New', monospace;
+  --fs-xs:       0.75rem;
+  --fs-sm:       0.875rem;
+  --fs-base:     1rem;
+  --fs-lg:       1.125rem;
+  --fs-xl:       1.25rem;
+  --fs-2xl:      1.5rem;
+  --fs-3xl:      2rem;
+  --fs-4xl:      2.5rem;
+
+  /* Espaciado */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Bordes */
+  --radius-sm:  4px;
+  --radius:     8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.5);
+  --shadow:      0 4px 16px rgba(0,0,0,0.6);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.8);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.7);
+
+  /* Transiciones */
+  --transition:      all 0.2s ease;
+  --transition-slow: all 0.4s ease;
+
+  /* Layout */
+  --container-max: 1280px;
+  --nav-height:    64px;
+}
+
+/* ── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+select,
+input,
+textarea {
+  font-family: inherit;
+  font-size: var(--fs-base);
+}
+
+ul {
+  list-style: none;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* ── Utilidades ────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+  font-size: var(--fs-sm);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.section-title {
+  font-size: var(--fs-3xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.section-subtitle {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-8);
+}
+
+/* ── Scrollbar personalizada ───────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-3);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-dim);
+}

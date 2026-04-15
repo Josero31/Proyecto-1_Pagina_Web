@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineReview — Blog de Películas y Series</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+
+  <!-- ── NAVBAR ───────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="nav-logo" data-view="home">
+        <span class="logo-icon">🎬</span> CineReview
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#" class="nav-link active" data-view="home">Inicio</a></li>
+        <li><a href="#" class="nav-link" data-view="create">Nueva Reseña</a></li>
+        <li><a href="#" class="nav-link" data-view="stats">Estadísticas</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── TOAST NOTIFICATIONS ──────────────────────────────── -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- ── MODAL DE CONFIRMACIÓN ────────────────────────────── -->
+  <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 class="modal-title">¿Eliminar reseña?</h3>
+      <p class="modal-text">Esta acción no se puede deshacer.</p>
+      <div class="modal-actions">
+        <button id="confirm-delete-btn" class="btn btn-danger">Eliminar</button>
+        <button id="cancel-delete-btn" class="btn btn-outline">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ──────────────────────────────────────────── -->
+  <main id="app">
+
+    <!-- ═══════════════════════════════════════════════════════
+         VISTA 1: HOME — Listado de películas
+    ═══════════════════════════════════════════════════════ -->
+    <section id="view-home" class="view active">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-content">
+          <h1 class="hero-title">Descubre & Reseña</h1>
+          <p class="hero-subtitle">Tu blog personal de películas y series</p>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filters-section container">
+        <div class="filters-bar">
+          <div class="search-wrapper">
+            <input
+              type="text"
+              id="search-input"
+              class="search-input"
+              placeholder="Buscar película o serie..."
+              autocomplete="off"
+            />
+            <button id="search-btn" class="btn btn-primary">Buscar</button>
+          </div>
+
+          <div class="filter-controls">
+            <select id="genre-filter" class="select-filter">
+              <option value="">Todos los géneros</option>
+            </select>
+
+            <select id="year-filter" class="select-filter">
+              <option value="">Todos los años</option>
+            </select>
+
+            <select id="sort-filter" class="select-filter">
+              <option value="popularity.desc">Más populares</option>
+              <option value="vote_average.desc">Mejor valoradas</option>
+              <option value="release_date.desc">Más recientes</option>
+            </select>
+
+            <button id="clear-filters" class="btn btn-outline">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid + paginación -->
+      <div class="container">
+        <p id="movies-count" class="results-count"></p>
+
+        <div id="movies-grid" class="movies-grid">
+          <!-- Cards inyectadas por ui.js -->
+        </div>
+
+        <div id="empty-state" class="empty-state hidden">
+          <span class="empty-icon">🎞️</span>
+          <p>No se encontraron resultados para tu búsqueda.</p>
+          <button id="empty-clear-btn" class="btn btn-outline">Ver todas las películas</button>
+        </div>
+
+        <div id="pagination" class="pagination">
+          <!-- Paginación inyectada por ui.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         VISTA 2: DETALLE de película
+    ═══════════════════════════════════════════════════════ -->
+    <section id="view-detail" class="view hidden">
+      <div class="container">
+        <button class="btn btn-outline back-btn" id="back-to-home">← Volver al inicio</button>
+        <div id="movie-detail">
+          <!-- Detalle inyectado por ui.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         VISTA 3: CREAR reseña (POST)
+    ═══════════════════════════════════════════════════════ -->
+    <section id="view-create" class="view hidden">
+      <div class="container">
+        <div class="form-page">
+          <h2 class="form-title">✍️ Nueva Reseña</h2>
+          <p class="form-subtitle">Comparte tu opinión sobre una película o serie</p>
+
+          <form id="create-form" class="review-form" novalidate>
+            <div class="form-group">
+              <label for="create-movie-title">Título de la película / serie *</label>
+              <input
+                type="text"
+                id="create-movie-title"
+                name="movieTitle"
+                placeholder="ej. Interstellar"
+              />
+              <span class="field-error" id="error-create-movieTitle"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="create-author">Tu nombre *</label>
+                <input
+                  type="text"
+                  id="create-author"
+                  name="author"
+                  placeholder="Tu nombre"
+                />
+                <span class="field-error" id="error-create-author"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="create-rating">Calificación (1–10) *</label>
+                <input
+                  type="number"
+                  id="create-rating"
+                  name="rating"
+                  min="1"
+                  max="10"
+                  placeholder="8"
+                />
+                <span class="field-error" id="error-create-rating"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="create-genre">Género *</label>
+              <select id="create-genre" name="genre">
+                <option value="">— Seleccionar género —</option>
+                <option value="Acción">Acción</option>
+                <option value="Animación">Animación</option>
+                <option value="Ciencia Ficción">Ciencia Ficción</option>
+                <option value="Comedia">Comedia</option>
+                <option value="Documental">Documental</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasía">Fantasía</option>
+                <option value="Romance">Romance</option>
+                <option value="Terror">Terror</option>
+                <option value="Thriller">Thriller</option>
+              </select>
+              <span class="field-error" id="error-create-genre"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="create-body">Reseña *</label>
+              <textarea
+                id="create-body"
+                name="body"
+                rows="7"
+                placeholder="Escribe tu reseña aquí (mínimo 20 caracteres)..."
+              ></textarea>
+              <span class="field-error" id="error-create-body"></span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="create-submit-btn">
+                Publicar Reseña
+              </button>
+              <button type="button" class="btn btn-outline" id="cancel-create">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         VISTA 4: EDITAR reseña (PUT)
+    ═══════════════════════════════════════════════════════ -->
+    <section id="view-edit" class="view hidden">
+      <div class="container">
+        <div class="form-page">
+          <h2 class="form-title">✏️ Editar Reseña</h2>
+          <p class="form-subtitle">Modifica tu reseña existente</p>
+
+          <form id="edit-form" class="review-form" novalidate>
+            <input type="hidden" id="edit-review-id" />
+
+            <div class="form-group">
+              <label for="edit-movie-title">Título de la película / serie *</label>
+              <input
+                type="text"
+                id="edit-movie-title"
+                name="movieTitle"
+                placeholder="ej. Interstellar"
+              />
+              <span class="field-error" id="error-edit-movieTitle"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="edit-author">Tu nombre *</label>
+                <input type="text" id="edit-author" name="author" />
+                <span class="field-error" id="error-edit-author"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-rating">Calificación (1–10) *</label>
+                <input type="number" id="edit-rating" name="rating" min="1" max="10" />
+                <span class="field-error" id="error-edit-rating"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-genre">Género *</label>
+              <select id="edit-genre" name="genre">
+                <option value="">— Seleccionar género —</option>
+                <option value="Acción">Acción</option>
+                <option value="Animación">Animación</option>
+                <option value="Ciencia Ficción">Ciencia Ficción</option>
+                <option value="Comedia">Comedia</option>
+                <option value="Documental">Documental</option>
+                <option value="Drama">Drama</option>
+                <option value="Fantasía">Fantasía</option>
+                <option value="Romance">Romance</option>
+                <option value="Terror">Terror</option>
+                <option value="Thriller">Thriller</option>
+              </select>
+              <span class="field-error" id="error-edit-genre"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-body">Reseña *</label>
+              <textarea id="edit-body" name="body" rows="7"></textarea>
+              <span class="field-error" id="error-edit-body"></span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" id="edit-submit-btn">
+                Guardar Cambios
+              </button>
+              <button type="button" class="btn btn-outline" id="cancel-edit">
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         VISTA 5: ESTADÍSTICAS (sección adicional)
+    ═══════════════════════════════════════════════════════ -->
+    <section id="view-stats" class="view hidden">
+      <div class="container">
+        <h2 class="section-title">📊 Estadísticas</h2>
+        <p class="section-subtitle">Resumen de la actividad del blog</p>
+        <div id="stats-content" class="stats-grid">
+          <!-- Stats inyectadas por ui.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        CineReview &copy; 2026 &mdash; Blog de Películas y Series &mdash;
+        Datos por <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>
+      </p>
+    </div>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
