@@ -166,6 +166,7 @@
                   placeholder="8"
                 />
                 <span class="field-error" id="error-create-rating"></span>
+                <div class="rating-preview" id="rating-preview-create" aria-hidden="true"></div>
               </div>
             </div>
 
@@ -195,12 +196,16 @@
                 rows="7"
                 placeholder="Escribe tu reseña aquí (mínimo 20 caracteres)..."
               ></textarea>
-              <span class="field-error" id="error-create-body"></span>
+              <div class="field-footer">
+                <span class="field-error" id="error-create-body"></span>
+                <span class="char-counter" id="counter-create-body">0 / 2000</span>
+              </div>
             </div>
 
             <div class="form-actions">
               <button type="submit" class="btn btn-primary btn-lg" id="create-submit-btn">
-                Publicar Reseña
+                <span class="btn-text">Publicar Reseña</span>
+                <span class="btn-spinner hidden"></span>
               </button>
               <button type="button" class="btn btn-outline" id="cancel-create">
                 Cancelar

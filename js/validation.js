@@ -136,6 +136,39 @@ function buildInputId(prefix, field) {
 }
 
 /* ──────────────────────────────────────────────────────────
+   validateField — valida un único campo (para blur en tiempo real)
+────────────────────────────────────────────────────────── */
+
+/**
+ * Valida un campo individual y muestra / limpia su error inline.
+ * Llamado en el evento 'blur' de cada input para feedback inmediato.
+ *
+ * @param {string} prefix - 'create' | 'edit'
+ * @param {string} field  - clave en RULES (ej. 'movieTitle')
+ * @param {string} value  - valor actual del campo
+ * @returns {boolean} true si el campo es válido
+ */
+export function validateField(prefix, field, value) {
+  const rule = RULES[field];
+  if (!rule) return true;
+
+  const error   = rule.validate(String(value ?? ''));
+  const inputId = buildInputId(prefix, field);
+  const input   = document.getElementById(inputId);
+  const errEl   = document.getElementById(`error-${prefix}-${field}`);
+
+  if (error) {
+    if (errEl)  errEl.textContent = error;
+    if (input)  input.classList.add('input-error');
+    return false;
+  }
+
+  if (errEl)  errEl.textContent = '';
+  if (input)  input.classList.remove('input-error');
+  return true;
+}
+
+/* ──────────────────────────────────────────────────────────
    Limpiar formulario
 ────────────────────────────────────────────────────────── */
 

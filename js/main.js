@@ -9,8 +9,8 @@
 
 import { navigateTo, loadHomeView } from './router.js';
 import { getGenres, createReview, updateReview, deleteReview } from './api.js';
-import { showToast, renderStats } from './ui.js';
-import { validateForm, getFormData, resetForm, clearErrors } from './validation.js';
+import { showToast } from './ui.js';
+import { validateForm, validateField, getFormData, resetForm, clearErrors } from './validation.js';
 import { state } from './state.js';
 
 /* ──────────────────────────────────────────────────────────
@@ -178,25 +178,72 @@ function populateYearFilter() {
 ────────────────────────────────────────────────────────── */
 
 function setupCreateForm() {
-  const form       = document.getElementById('create-form');
-  const cancelBtn  = document.getElementById('cancel-create');
-  const submitBtn  = document.getElementById('create-submit-btn');
+  const form      = document.getElementById('create-form');
+  const cancelBtn = document.getElementById('cancel-create');
+  const submitBtn = document.getElementById('create-submit-btn');
 
+  if (!form) return;
+
+  // ── Cancelar ────────────────────────────────────────────
   cancelBtn?.addEventListener('click', () => {
     resetForm('create-form', 'create');
+    resetRatingPreview('create');
+    resetCharCounter('create-body');
     navigateTo('home');
   });
 
-  form?.addEventListener('submit', async e => {
+  // ── Validación en tiempo real por campo (blur) ─────────
+  // Cada campo se valida individualmente al perder el foco,
+  // mostrando el error inline sin necesidad de hacer submit.
+  const blurFields = [
+    { inputId: 'create-movie-title', field: 'movieTitle' },
+    { inputId: 'create-author',      field: 'author'     },
+    { inputId: 'create-rating',      field: 'rating'     },
+    { inputId: 'create-genre',       field: 'genre'      },
+    { inputId: 'create-body',        field: 'body'       },
+  ];
+
+  blurFields.forEach(({ inputId, field }) => {
+    const el = document.getElementById(inputId);
+    el?.addEventListener('blur', () => {
+      validateField('create', field, el.value);
+    });
+  });
+
+  // ── Contador de caracteres en textarea ─────────────────
+  const textarea = document.getElementById('create-body');
+  const counter  = document.getElementById('counter-create-body');
+  const MAX_CHARS = 2000;
+
+  textarea?.addEventListener('input', () => {
+    const len = textarea.value.length;
+    if (counter) {
+      counter.textContent = `${len} / ${MAX_CHARS}`;
+      counter.classList.toggle('counter-warn',  len >= MAX_CHARS * 0.85);
+      counter.classList.toggle('counter-limit', len >= MAX_CHARS);
+    }
+  });
+
+  // ── Preview de estrellas al escribir la calificación ───
+  document.getElementById('create-rating')?.addEventListener('input', e => {
+    updateRatingPreview('create', e.target.value);
+  });
+
+  // ── Submit — POST a la API ─────────────────────────────
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const data = getFormData('create');
 
-    // Validación completa desde JS (RT-05)
-    if (!validateForm('create', data)) return;
+    // Validación completa desde JS antes de enviar (RT-05)
+    if (!validateForm('create', data)) {
+      // Hacer foco en el primer campo con error para accesibilidad
+      const firstError = form.querySelector('.input-error');
+      firstError?.focus();
+      return;
+    }
 
-    submitBtn.disabled   = true;
-    submitBtn.textContent = 'Publicando…';
+    setSubmitLoading(submitBtn, true, 'Publicando…');
 
     try {
       const created = await createReview({
@@ -208,26 +255,68 @@ function setupCreateForm() {
         genre:      data.genre,
       });
 
-      // Añadir al estado local para que aparezca inmediatamente
+      // Reflejar inmediatamente en el estado local (sin recargar)
       state.reviews.unshift({
         ...created,
         movieTitle: data.movieTitle,
         author:     data.author,
-        rating:     data.rating,
+        rating:     Number(data.rating),
         genre:      data.genre,
       });
 
-      showToast('¡Reseña publicada con éxito!', 'success');
+      showToast('¡Reseña publicada con éxito! 🎬', 'success');
       resetForm('create-form', 'create');
+      resetRatingPreview('create');
+      resetCharCounter('create-body');
       navigateTo('home');
 
     } catch (error) {
       showToast(`Error al publicar: ${error.message}`, 'error');
     } finally {
-      submitBtn.disabled   = false;
-      submitBtn.textContent = 'Publicar Reseña';
+      setSubmitLoading(submitBtn, false, 'Publicar Reseña');
     }
   });
+}
+
+/* ── Helpers del formulario Create ─────────────────────── */
+
+/** Activa / desactiva el estado de carga del botón submit */
+function setSubmitLoading(btn, loading, label) {
+  if (!btn) return;
+  btn.disabled = loading;
+  const text    = btn.querySelector('.btn-text');
+  const spinner = btn.querySelector('.btn-spinner');
+  if (text)    text.textContent = label;
+  if (spinner) spinner.classList.toggle('hidden', !loading);
+}
+
+/** Muestra estrellas según la calificación ingresada */
+function updateRatingPreview(prefix, value) {
+  const preview = document.getElementById(`rating-preview-${prefix}`);
+  if (!preview) return;
+  const n = parseInt(value, 10);
+  if (!value || isNaN(n) || n < 1 || n > 10) {
+    preview.textContent = '';
+    return;
+  }
+  const filled = Math.round(n / 2);         // escala 1-10 → 1-5 estrellas
+  const empty  = 5 - filled;
+  preview.textContent = '★'.repeat(filled) + '☆'.repeat(empty) + `  ${n}/10`;
+}
+
+/** Resetea el preview de estrellas */
+function resetRatingPreview(prefix) {
+  const preview = document.getElementById(`rating-preview-${prefix}`);
+  if (preview) preview.textContent = '';
+}
+
+/** Resetea el contador de caracteres */
+function resetCharCounter(textareaId) {
+  const counter = document.getElementById(`counter-${textareaId}`);
+  if (counter) {
+    counter.textContent = '0 / 2000';
+    counter.classList.remove('counter-warn', 'counter-limit');
+  }
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -239,12 +328,14 @@ function setupEditForm() {
   const cancelBtn = document.getElementById('cancel-edit');
   const submitBtn = document.getElementById('edit-submit-btn');
 
+  if (!form) return;
+
   cancelBtn?.addEventListener('click', () => {
     clearErrors('edit');
     navigateTo('home');
   });
 
-  form?.addEventListener('submit', async e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const id   = document.getElementById('edit-review-id')?.value;
@@ -252,8 +343,10 @@ function setupEditForm() {
 
     if (!validateForm('edit', data)) return;
 
-    submitBtn.disabled   = true;
-    submitBtn.textContent = 'Guardando…';
+    if (submitBtn) {
+      submitBtn.disabled    = true;
+      submitBtn.textContent = 'Guardando…';
+    }
 
     try {
       const updated = await updateReview(id, {
@@ -265,7 +358,6 @@ function setupEditForm() {
         genre:      data.genre,
       });
 
-      // Reflejar el cambio en el estado local
       const idx = state.reviews.findIndex(r => String(r.id) === String(id));
       if (idx !== -1) {
         state.reviews[idx] = {
@@ -285,8 +377,10 @@ function setupEditForm() {
     } catch (error) {
       showToast(`Error al actualizar: ${error.message}`, 'error');
     } finally {
-      submitBtn.disabled   = false;
-      submitBtn.textContent = 'Guardar Cambios';
+      if (submitBtn) {
+        submitBtn.disabled    = false;
+        submitBtn.textContent = 'Guardar Cambios';
+      }
     }
   });
 }

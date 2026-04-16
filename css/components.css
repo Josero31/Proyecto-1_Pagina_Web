@@ -130,6 +130,7 @@
   font-weight: 700;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 
@@ -333,7 +334,10 @@
 
 .detail-hero-overlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(
     to bottom,
     rgba(10,10,10,0.3) 0%,
@@ -401,6 +405,7 @@
   font-size: var(--fs-xs);
   font-weight: 600;
   color: var(--color-text);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 
@@ -609,11 +614,12 @@
 }
 
 .form-group select {
+  -webkit-appearance: none;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-4) center;
-  padding-right: var(--space-10);
+  padding-right: 2.5rem;
 }
 
 .form-group select option {
@@ -687,13 +693,17 @@
 /* ── Modal de Confirmación ──────────────────────────────── */
 .modal-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 200;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-4);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
 }
 
@@ -770,6 +780,55 @@
 .stat-card-sub {
   font-size: var(--fs-xs);
   color: var(--color-text-dim);
+}
+
+/* ── Formulario: footer de campo (error + contador) ────── */
+.field-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-height: 18px;
+}
+
+/* Contador de caracteres */
+.char-counter {
+  font-size: var(--fs-xs);
+  color: var(--color-text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.char-counter.counter-warn {
+  color: var(--color-warning);
+}
+
+.char-counter.counter-limit {
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+/* Preview de estrellas (calificación) */
+.rating-preview {
+  font-size: var(--fs-lg);
+  color: var(--color-accent);
+  letter-spacing: 2px;
+  min-height: 24px;
+  margin-top: var(--space-1);
+  transition: var(--transition);
+}
+
+/* Spinner dentro del botón submit */
+.btn-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
 }
 
 /* ── Loading spinner (inline) ───────────────────────────── */
