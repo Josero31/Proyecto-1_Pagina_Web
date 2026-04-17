@@ -330,23 +330,66 @@ function setupEditForm() {
 
   if (!form) return;
 
+  // ── Cancelar — volver al detalle si venimos de uno ─────
   cancelBtn?.addEventListener('click', () => {
     clearErrors('edit');
-    navigateTo('home');
+    resetRatingPreview('edit');
+    if (state.currentMovieId) {
+      navigateTo('detail', { movieId: state.currentMovieId });
+    } else {
+      navigateTo('home');
+    }
   });
 
+  // ── Validación en tiempo real por campo (blur) ─────────
+  const blurFields = [
+    { inputId: 'edit-movie-title', field: 'movieTitle' },
+    { inputId: 'edit-author',      field: 'author'     },
+    { inputId: 'edit-rating',      field: 'rating'     },
+    { inputId: 'edit-genre',       field: 'genre'      },
+    { inputId: 'edit-body',        field: 'body'        },
+  ];
+
+  blurFields.forEach(({ inputId, field }) => {
+    const el = document.getElementById(inputId);
+    el?.addEventListener('blur', () => {
+      validateField('edit', field, el.value);
+    });
+  });
+
+  // ── Contador de caracteres en textarea ─────────────────
+  const textarea = document.getElementById('edit-body');
+  const counter  = document.getElementById('counter-edit-body');
+  const MAX_CHARS = 2000;
+
+  textarea?.addEventListener('input', () => {
+    const len = textarea.value.length;
+    if (counter) {
+      counter.textContent = `${len} / ${MAX_CHARS}`;
+      counter.classList.toggle('counter-warn',  len >= MAX_CHARS * 0.85);
+      counter.classList.toggle('counter-limit', len >= MAX_CHARS);
+    }
+  });
+
+  // ── Preview de estrellas al escribir la calificación ───
+  document.getElementById('edit-rating')?.addEventListener('input', e => {
+    updateRatingPreview('edit', e.target.value);
+  });
+
+  // ── Submit — PUT a la API ──────────────────────────────
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const id   = document.getElementById('edit-review-id')?.value;
     const data = getFormData('edit');
 
-    if (!validateForm('edit', data)) return;
-
-    if (submitBtn) {
-      submitBtn.disabled    = true;
-      submitBtn.textContent = 'Guardando…';
+    if (!validateForm('edit', data)) {
+      const firstError = form.querySelector('.input-error');
+      firstError?.focus();
+      return;
     }
+
+    setSubmitLoading(submitBtn, true, 'Guardando…');
 
     try {
       const updated = await updateReview(id, {
@@ -358,6 +401,7 @@ function setupEditForm() {
         genre:      data.genre,
       });
 
+      // Actualizar en el estado local sin recargar
       const idx = state.reviews.findIndex(r => String(r.id) === String(id));
       if (idx !== -1) {
         state.reviews[idx] = {
@@ -365,22 +409,26 @@ function setupEditForm() {
           ...updated,
           movieTitle: data.movieTitle,
           author:     data.author,
-          rating:     data.rating,
+          rating:     Number(data.rating),
           genre:      data.genre,
         };
       }
 
-      showToast('Reseña actualizada correctamente.', 'success');
+      showToast('Reseña actualizada correctamente. ✏️', 'success');
       clearErrors('edit');
-      navigateTo('home');
+      resetRatingPreview('edit');
+
+      // Volver al detalle donde estaba el usuario
+      if (state.currentMovieId) {
+        navigateTo('detail', { movieId: state.currentMovieId });
+      } else {
+        navigateTo('home');
+      }
 
     } catch (error) {
       showToast(`Error al actualizar: ${error.message}`, 'error');
     } finally {
-      if (submitBtn) {
-        submitBtn.disabled    = false;
-        submitBtn.textContent = 'Guardar Cambios';
-      }
+      setSubmitLoading(submitBtn, false, 'Guardar Cambios');
     }
   });
 }

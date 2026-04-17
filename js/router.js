@@ -219,6 +219,25 @@ export function prefillEditForm(review) {
   setVal('edit-rating',       review.rating || '');
   setVal('edit-genre',        review.genre || '');
   setVal('edit-body',         review.body || '');
+
+  // Actualizar preview de estrellas con la calificación cargada
+  const ratingVal = review.rating ? String(review.rating) : '';
+  const preview   = document.getElementById('rating-preview-edit');
+  if (preview && ratingVal) {
+    const n      = parseInt(ratingVal, 10);
+    const filled = Math.round(n / 2);
+    const empty  = 5 - filled;
+    preview.textContent = '★'.repeat(filled) + '☆'.repeat(empty) + `  ${n}/10`;
+  }
+
+  // Actualizar contador de caracteres con el body cargado
+  const body    = review.body || '';
+  const counter = document.getElementById('counter-edit-body');
+  if (counter) {
+    counter.textContent = `${body.length} / 2000`;
+    counter.classList.toggle('counter-warn',  body.length >= 1700);
+    counter.classList.toggle('counter-limit', body.length >= 2000);
+  }
 }
 
 /* ──────────────────────────────────────────────────────────

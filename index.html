@@ -250,6 +250,7 @@
                 <label for="edit-rating">Calificación (1–10) *</label>
                 <input type="number" id="edit-rating" name="rating" min="1" max="10" />
                 <span class="field-error" id="error-edit-rating"></span>
+                <div class="rating-preview" id="rating-preview-edit" aria-hidden="true"></div>
               </div>
             </div>
 
@@ -274,12 +275,16 @@
             <div class="form-group">
               <label for="edit-body">Reseña *</label>
               <textarea id="edit-body" name="body" rows="7"></textarea>
-              <span class="field-error" id="error-edit-body"></span>
+              <div class="field-footer">
+                <span class="field-error" id="error-edit-body"></span>
+                <span class="char-counter" id="counter-edit-body">0 / 2000</span>
+              </div>
             </div>
 
             <div class="form-actions">
               <button type="submit" class="btn btn-primary btn-lg" id="edit-submit-btn">
-                Guardar Cambios
+                <span class="btn-text">Guardar Cambios</span>
+                <span class="btn-spinner hidden"></span>
               </button>
               <button type="button" class="btn btn-outline" id="cancel-edit">
                 Cancelar

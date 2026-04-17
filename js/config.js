@@ -7,7 +7,7 @@
 ═══════════════════════════════════════════════════════════ */
 
 // ── TMDB (The Movie Database) ───────────────────────────
-export const TMDB_API_KEY   = 'PEGA_TU_API_KEY_AQUI';
+export const TMDB_API_KEY   = 'c34488c2a67203a7c59b0ab5c4d48f38';
 export const TMDB_BASE_URL  = 'https://api.themoviedb.org/3';
 export const TMDB_IMAGE_W500  = 'https://image.tmdb.org/t/p/w500';
 export const TMDB_IMAGE_W1280 = 'https://image.tmdb.org/t/p/w1280';
