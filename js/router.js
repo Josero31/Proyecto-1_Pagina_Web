@@ -24,6 +24,7 @@ import {
   updateResultsCount,
   showError,
   showEmptyState,
+  showStatsError,
   setActiveNavLink,
 } from './ui.js';
 
@@ -195,8 +196,22 @@ async function loadReviewsForDetail() {
    loadStatsView — Sección adicional del equipo
 ────────────────────────────────────────────────────────── */
 
-function loadStatsView() {
-  renderStats(state.reviews);
+async function loadStatsView() {
+  const container = document.getElementById('stats-content');
+  if (container) {
+    container.innerHTML = '<div class="spinner" style="margin-top:2rem"></div>';
+  }
+
+  try {
+    // Si no hay reseñas cargadas aún (usuario fue directo a Stats), cargarlas
+    if (state.reviews.length === 0) {
+      const data   = await getReviews();
+      state.reviews = data.posts || [];
+    }
+    renderStats(state.reviews, state.sessionReviews);
+  } catch (error) {
+    showStatsError(`No se pudieron cargar las estadísticas: ${error.message}`);
+  }
 }
 
 /* ──────────────────────────────────────────────────────────

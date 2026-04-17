@@ -338,34 +338,63 @@ function createReviewCardHTML(review) {
 
 /**
  * Renderiza la sección de estadísticas del blog.
- * @param {Array} reviews - Lista de reseñas de la sesión
+ * @param {Array} reviews        - Todas las reseñas cargadas
+ * @param {Array} sessionReviews - Reseñas creadas en esta sesión
  */
-export function renderStats(reviews) {
+export function renderStats(reviews, sessionReviews = []) {
   const container = document.getElementById('stats-content');
   if (!container) return;
 
-  const total   = reviews.length;
-  const avgRating = total > 0
-    ? (reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / total).toFixed(1)
+  // Reseñas con calificación (las de DummyJSON no tienen rating propio)
+  const rated = reviews.filter(r => r.rating != null && r.rating !== '');
+  const total  = reviews.length;
+
+  const avgRating = rated.length > 0
+    ? (rated.reduce((sum, r) => sum + Number(r.rating || 0), 0) / rated.length).toFixed(1)
     : '–';
 
   const genreCount = {};
   reviews.forEach(r => {
     if (r.genre) genreCount[r.genre] = (genreCount[r.genre] || 0) + 1;
   });
-
   const topGenre = Object.entries(genreCount).sort((a, b) => b[1] - a[1])[0];
 
-  const highestRated = reviews.reduce((best, r) => {
+  const highestRated = rated.reduce((best, r) => {
     return Number(r.rating) > Number(best?.rating ?? 0) ? r : best;
   }, null);
+
+  if (total === 0) {
+    container.innerHTML = `
+      <div class="stats-empty">
+        <p class="stats-empty-icon">📊</p>
+        <p class="stats-empty-msg">Aún no hay reseñas registradas.</p>
+        <p class="text-muted">Visita el detalle de una película y escribe la primera.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const sessionHTML = sessionReviews.length > 0 ? `
+    <div class="stats-session">
+      <h3 class="stats-session-title">Reseñas de esta sesión</h3>
+      <div class="stats-session-list">
+        ${sessionReviews.map(r => `
+          <div class="stats-session-item">
+            <span class="stats-session-movie">${escapeHTML(r.movieTitle || r.title || 'Sin título')}</span>
+            <span class="stats-session-rating">⭐ ${r.rating ?? '–'}/10</span>
+            ${r.genre ? `<span class="review-genre">${escapeHTML(r.genre)}</span>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
 
   container.innerHTML = `
     <div class="stat-card">
       <span class="stat-card-icon">📝</span>
-      <span class="stat-card-label">Reseñas escritas</span>
+      <span class="stat-card-label">Total de reseñas</span>
       <span class="stat-card-value">${total}</span>
-      <span class="stat-card-sub">en esta sesión</span>
+      <span class="stat-card-sub">en la base de datos</span>
     </div>
 
     <div class="stat-card">
@@ -395,6 +424,24 @@ export function renderStats(reviews) {
       <span class="stat-card-sub">
         ${highestRated ? `⭐ ${highestRated.rating}/10` : 'sin datos'}
       </span>
+    </div>
+
+    ${sessionHTML}
+  `;
+}
+
+/**
+ * Muestra un error en la vista de estadísticas.
+ * @param {string} message
+ */
+export function showStatsError(message) {
+  const container = document.getElementById('stats-content');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="error-state">
+      <p class="error-icon">⚠️</p>
+      <p class="error-message">${escapeHTML(message)}</p>
+      <button class="btn btn-outline" onclick="location.reload()">Reintentar</button>
     </div>
   `;
 }

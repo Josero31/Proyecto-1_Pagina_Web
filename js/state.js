@@ -25,6 +25,7 @@ export const state = {
 
   // ── Reseñas (CRUD con DummyJSON) ───────────────────
   reviews:         [],      // reseñas cargadas en la sesión
+  sessionReviews:  [],      // reseñas creadas/editadas en esta sesión
   currentReviewId: null,    // ID de la reseña en edición
   pendingDeleteId: null,    // ID esperando confirmación de borrado
 };

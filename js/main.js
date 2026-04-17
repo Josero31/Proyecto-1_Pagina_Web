@@ -103,6 +103,8 @@ function applyFilters() {
   state.sortBy        = document.getElementById('sort-filter')?.value ?? 'popularity.desc';
   state.currentPage   = 1;
 
+  updateActiveFiltersIndicator();
+
   // Si no estamos en home, navegar primero
   if (state.currentView !== 'home') {
     navigateTo('home');
@@ -112,14 +114,12 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  // Resetear estado
   state.searchQuery   = '';
   state.selectedGenre = '';
   state.selectedYear  = '';
   state.sortBy        = 'popularity.desc';
   state.currentPage   = 1;
 
-  // Resetear controles
   const setVal = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.value = val;
@@ -129,7 +129,23 @@ function clearFilters() {
   setVal('year-filter',  '');
   setVal('sort-filter',  'popularity.desc');
 
+  updateActiveFiltersIndicator();
   loadHomeView();
+}
+
+/** Resalta el botón "Limpiar" y muestra un badge cuando hay filtros activos */
+function updateActiveFiltersIndicator() {
+  const hasFilters =
+    state.searchQuery ||
+    state.selectedGenre ||
+    state.selectedYear ||
+    state.sortBy !== 'popularity.desc';
+
+  const clearBtn    = document.getElementById('clear-filters');
+  const filtersBar  = document.querySelector('.filters-bar');
+
+  clearBtn?.classList.toggle('filters-active', !!hasFilters);
+  filtersBar?.classList.toggle('has-active-filters', !!hasFilters);
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -255,14 +271,17 @@ function setupCreateForm() {
         genre:      data.genre,
       });
 
-      // Reflejar inmediatamente en el estado local (sin recargar)
-      state.reviews.unshift({
+      const newReview = {
         ...created,
         movieTitle: data.movieTitle,
         author:     data.author,
         rating:     Number(data.rating),
         genre:      data.genre,
-      });
+      };
+
+      // Reflejar inmediatamente en el estado local (sin recargar)
+      state.reviews.unshift(newReview);
+      state.sessionReviews.unshift(newReview);
 
       showToast('¡Reseña publicada con éxito! 🎬', 'success');
       resetForm('create-form', 'create');
