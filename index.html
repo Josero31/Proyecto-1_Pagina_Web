@@ -29,12 +29,20 @@
   <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
   <!-- ── MODAL DE CONFIRMACIÓN ────────────────────────────── -->
-  <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true"
+       aria-labelledby="modal-title-text">
     <div class="modal">
-      <h3 class="modal-title">¿Eliminar reseña?</h3>
-      <p class="modal-text">Esta acción no se puede deshacer.</p>
+      <h3 class="modal-title" id="modal-title-text">¿Eliminar reseña?</h3>
+      <p class="modal-text">
+        Vas a eliminar la reseña de
+        <strong id="delete-movie-name"></strong>.
+        Esta acción no se puede deshacer.
+      </p>
       <div class="modal-actions">
-        <button id="confirm-delete-btn" class="btn btn-danger">Eliminar</button>
+        <button id="confirm-delete-btn" class="btn btn-danger">
+          <span class="btn-text">Eliminar</span>
+          <span class="btn-spinner hidden"></span>
+        </button>
         <button id="cancel-delete-btn" class="btn btn-outline">Cancelar</button>
       </div>
     </div>

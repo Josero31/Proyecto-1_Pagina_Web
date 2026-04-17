@@ -319,9 +319,16 @@ function attachReviewEvents() {
     }
 
     if (deleteBtn) {
-      const id = deleteBtn.dataset.reviewId;
+      const id     = deleteBtn.dataset.reviewId;
+      const review = state.reviews.find(r => String(r.id) === String(id));
       state.pendingDeleteId = id;
-      // Mostrar modal de confirmación (gestionado en main.js)
+
+      // Mostrar el título de la película en el modal
+      const nameEl = document.getElementById('delete-movie-name');
+      if (nameEl) {
+        nameEl.textContent = review?.movieTitle || review?.title || 'esta reseña';
+      }
+
       document.getElementById('confirm-modal')?.classList.remove('hidden');
     }
   });

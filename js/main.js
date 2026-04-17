@@ -459,27 +459,39 @@ function setupConfirmModal() {
     const id = state.pendingDeleteId;
     if (!id) return;
 
-    confirmBtn.disabled   = true;
-    confirmBtn.textContent = 'Eliminando…';
+    setSubmitLoading(confirmBtn, true, 'Eliminando…');
 
     try {
       await deleteReview(id);
 
-      // Remover del estado y del DOM inmediatamente
+      // Remover del estado local
       state.reviews = state.reviews.filter(r => String(r.id) !== String(id));
 
-      const card = document.querySelector(`[data-review-id="${id}"]`);
-      card?.remove();
+      // Remover la tarjeta del DOM con animación
+      const card = document.querySelector(`.review-card[data-review-id="${id}"]`);
+      if (card) {
+        card.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+        card.style.opacity    = '0';
+        card.style.transform  = 'scale(0.95)';
+        setTimeout(() => {
+          card.remove();
 
-      showToast('Reseña eliminada.', 'success');
+          // Si ya no quedan reseñas, mostrar mensaje vacío
+          const list = document.getElementById('reviews-list');
+          if (list && list.querySelectorAll('.review-card').length === 0) {
+            list.innerHTML = '<p class="no-reviews">Sé el primero en escribir una reseña.</p>';
+          }
+        }, 260);
+      }
+
+      showToast('Reseña eliminada correctamente.', 'success');
 
     } catch (error) {
       showToast(`Error al eliminar: ${error.message}`, 'error');
     } finally {
       state.pendingDeleteId = null;
       modal?.classList.add('hidden');
-      confirmBtn.disabled   = false;
-      confirmBtn.textContent = 'Eliminar';
+      setSubmitLoading(confirmBtn, false, 'Eliminar');
     }
   });
 }
