@@ -1,20 +1,10 @@
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
 <div align="center">
   <h3 align="center">CineReview — Blog de Películas y Series</h3>
 
   <p align="center">
     Un blog CRUD completo para descubrir películas, leer detalles y gestionar reseñas, construido con HTML5, CSS3 y JavaScript Vanilla.
     <br />
-    <a href="#"><strong>Explorar la documentación »</strong></a>
     <br />
-    <br />
-    <a href="#">Ver Demo</a>
-    ·
     <a href="https://github.com/Josero31/Proyecto-1_Pagina_Web/issues">Reportar Bug</a>
     ·
     <a href="https://github.com/Josero31/Proyecto-1_Pagina_Web/issues">Solicitar Feature</a>
@@ -177,7 +167,7 @@ Si tienes alguna sugerencia para mejorar el proyecto, haz un fork del repositori
 
 ## Licencia
 
-Distribuido bajo la Licencia MIT. Ver `LICENSE.txt` para más información.
+Distribuido bajo la Licencia MIT.
 
 <p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
@@ -200,7 +190,6 @@ Link del proyecto: [https://github.com/Josero31/Proyecto-1_Pagina_Web](https://g
 * [Shields.io](https://shields.io) — Badges del README
 * [Best-README-Template](https://github.com/othneildrew/Best-README-Template) — Estructura de este README
 * [Live Server — VS Code](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
-* [Font Awesome](https://fontawesome.com)
 
 <p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
