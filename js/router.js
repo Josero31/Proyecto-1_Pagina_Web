@@ -139,9 +139,8 @@ export async function loadHomeView() {
     renderPagination(state.currentPage, state.totalPages);
     updateResultsCount(state.totalResults);
 
-    // Delegar eventos de cards y paginación
+    // Delegar eventos de cards
     attachCardEvents();
-    attachPaginationEvents();
 
   } catch (error) {
     showError(`No se pudo cargar el listado: ${error.message}`);
@@ -324,7 +323,7 @@ function handleCardClick(e) {
 /**
  * Escucha clics en botones de paginación.
  */
-function attachPaginationEvents() {
+export function attachPaginationEvents() {
   const container = document.getElementById('pagination');
   if (!container) return;
 
@@ -336,7 +335,7 @@ function attachPaginationEvents() {
       state.currentPage++;
       loadHomeView();
     }
-  }, { once: true });
+  });
 }
 
 /**

@@ -7,7 +7,7 @@
    · No hace fetch() directamente; delega a api.js y router.js.
 ═══════════════════════════════════════════════════════════ */
 
-import { navigateTo, loadHomeView } from './router.js';
+import { navigateTo, loadHomeView, attachPaginationEvents } from './router.js';
 import { getGenres, createReview, updateReview, deleteReview } from './api.js';
 import { showToast } from './ui.js';
 import { validateForm, validateField, getFormData, resetForm, clearErrors } from './validation.js';
@@ -29,6 +29,7 @@ async function init() {
 
   await loadGenresFilter();
   populateYearFilter();
+  attachPaginationEvents();
 
   // Carga inicial
   navigateTo('home');
