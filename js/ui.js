@@ -345,25 +345,9 @@ export function renderStats(reviews, sessionReviews = []) {
   const container = document.getElementById('stats-content');
   if (!container) return;
 
-  // Reseñas con calificación (las de DummyJSON no tienen rating propio)
-  const rated = reviews.filter(r => r.rating != null && r.rating !== '');
-  const total  = reviews.length;
+  const total = reviews.length;
 
-  const avgRating = rated.length > 0
-    ? (rated.reduce((sum, r) => sum + Number(r.rating || 0), 0) / rated.length).toFixed(1)
-    : '–';
-
-  const genreCount = {};
-  reviews.forEach(r => {
-    if (r.genre) genreCount[r.genre] = (genreCount[r.genre] || 0) + 1;
-  });
-  const topGenre = Object.entries(genreCount).sort((a, b) => b[1] - a[1])[0];
-
-  const highestRated = rated.reduce((best, r) => {
-    return Number(r.rating) > Number(best?.rating ?? 0) ? r : best;
-  }, null);
-
-  if (total === 0) {
+  if (total === 0 && sessionReviews.length === 0) {
     container.innerHTML = `
       <div class="stats-empty">
         <p class="stats-empty-icon">📊</p>
@@ -374,60 +358,130 @@ export function renderStats(reviews, sessionReviews = []) {
     return;
   }
 
-  const sessionHTML = sessionReviews.length > 0 ? `
-    <div class="stats-session">
-      <h3 class="stats-session-title">Reseñas de esta sesión</h3>
-      <div class="stats-session-list">
-        ${sessionReviews.map(r => `
-          <div class="stats-session-item">
-            <span class="stats-session-movie">${escapeHTML(r.movieTitle || r.title || 'Sin título')}</span>
-            <span class="stats-session-rating">⭐ ${r.rating ?? '–'}/10</span>
-            ${r.genre ? `<span class="review-genre">${escapeHTML(r.genre)}</span>` : ''}
+  // Promedios
+  const rated = reviews.filter(r => r.rating != null && r.rating !== '');
+  const avgAll = rated.length > 0
+    ? (rated.reduce((sum, r) => sum + Number(r.rating), 0) / rated.length).toFixed(1) : '–';
+
+  const sessionRated = sessionReviews.filter(r => r.rating != null && r.rating !== '');
+  const avgSession = sessionRated.length > 0
+    ? (sessionRated.reduce((sum, r) => sum + Number(r.rating), 0) / sessionRated.length).toFixed(1) : null;
+
+  const avgDisplay  = avgSession ?? avgAll;
+  const avgLabel    = avgSession ? 'Promedio sesión' : 'Promedio general';
+
+  // Mejor calificada (sesión primero)
+  const bestSession = sessionRated.reduce((best, r) =>
+    Number(r.rating) > Number(best?.rating ?? 0) ? r : best, null);
+
+  // Distribución de calificaciones
+  const distSource = sessionReviews.length > 0 ? sessionReviews : reviews;
+  const dist = {};
+  for (let i = 1; i <= 10; i++) dist[i] = 0;
+  distSource.forEach(r => {
+    const n = Math.round(Number(r.rating));
+    if (n >= 1 && n <= 10) dist[n]++;
+  });
+  const maxDist = Math.max(...Object.values(dist), 1);
+
+  // Géneros (sesión)
+  const genreCount = {};
+  sessionReviews.forEach(r => {
+    if (r.genre) genreCount[r.genre] = (genreCount[r.genre] || 0) + 1;
+  });
+  const sortedGenres = Object.entries(genreCount).sort((a, b) => b[1] - a[1]);
+
+  // ── HTML ────────────────────────────────────────────────
+  const summaryCards = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-card-icon">📝</span>
+        <span class="stat-card-label">Total en la BD</span>
+        <span class="stat-card-value">${total}</span>
+        <span class="stat-card-sub">reseñas cargadas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">✍️</span>
+        <span class="stat-card-label">Esta sesión</span>
+        <span class="stat-card-value">${sessionReviews.length}</span>
+        <span class="stat-card-sub">${sessionReviews.length === 1 ? 'reseña escrita' : 'reseñas escritas'}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">⭐</span>
+        <span class="stat-card-label">${avgLabel}</span>
+        <span class="stat-card-value">${avgDisplay}</span>
+        <span class="stat-card-sub">sobre 10 puntos</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">🏆</span>
+        <span class="stat-card-label">Mejor calificada</span>
+        <span class="stat-card-value stat-card-value--sm">
+          ${bestSession ? escapeHTML(bestSession.movieTitle || bestSession.title || '–') : '–'}
+        </span>
+        <span class="stat-card-sub">
+          ${bestSession ? `⭐ ${bestSession.rating}/10` : 'sin reseñas en sesión'}
+        </span>
+      </div>
+    </div>
+  `;
+
+  const distLabel = sessionReviews.length > 0 ? 'Distribución de calificaciones (sesión)' : 'Distribución de calificaciones';
+  const distHTML = `
+    <div class="stats-section">
+      <h3 class="stats-section-title">${distLabel}</h3>
+      <div class="stats-dist">
+        ${Object.entries(dist).map(([score, count]) => `
+          <div class="stats-dist-row">
+            <span class="stats-dist-label">${score}</span>
+            <div class="stats-dist-track">
+              <div class="stats-dist-bar" style="width:${count > 0 ? Math.max((count / maxDist) * 100, 3) : 0}%"></div>
+            </div>
+            <span class="stats-dist-count">${count}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  const genreHTML = sortedGenres.length > 0 ? `
+    <div class="stats-section">
+      <h3 class="stats-section-title">Géneros reseñados</h3>
+      <div class="stats-genres">
+        ${sortedGenres.map(([genre, count]) => `
+          <div class="stats-genre-chip">
+            <span class="stats-genre-name">${escapeHTML(genre)}</span>
+            <span class="stats-genre-count">${count}</span>
           </div>
         `).join('')}
       </div>
     </div>
   ` : '';
 
-  container.innerHTML = `
-    <div class="stat-card">
-      <span class="stat-card-icon">📝</span>
-      <span class="stat-card-label">Total de reseñas</span>
-      <span class="stat-card-value">${total}</span>
-      <span class="stat-card-sub">en la base de datos</span>
+  const sessionCardsHTML = sessionReviews.length > 0 ? `
+    <div class="stats-section">
+      <h3 class="stats-section-title">Mis reseñas de esta sesión</h3>
+      <div class="stats-reviews-grid">
+        ${sessionReviews.map(r => `
+          <div class="stats-review-card">
+            <div class="stats-review-header">
+              <span class="stats-review-movie">${escapeHTML(r.movieTitle || r.title || 'Sin título')}</span>
+              <span class="stats-review-badge">${r.rating}/10</span>
+            </div>
+            ${r.genre ? `<span class="review-genre">${escapeHTML(r.genre)}</span>` : ''}
+            <p class="stats-review-body">${escapeHTML((r.body || '').slice(0, 130))}${(r.body || '').length > 130 ? '…' : ''}</p>
+            <span class="stats-review-author">— ${escapeHTML(r.author || 'Anónimo')}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
-
-    <div class="stat-card">
-      <span class="stat-card-icon">⭐</span>
-      <span class="stat-card-label">Calificación promedio</span>
-      <span class="stat-card-value">${avgRating}</span>
-      <span class="stat-card-sub">sobre 10 puntos</span>
+  ` : `
+    <div class="stats-section stats-no-session">
+      <p>Aún no has escrito reseñas en esta sesión.</p>
+      <p class="text-muted">Busca una película y haz clic en "Escribir Reseña".</p>
     </div>
-
-    <div class="stat-card">
-      <span class="stat-card-icon">🎭</span>
-      <span class="stat-card-label">Género más reseñado</span>
-      <span class="stat-card-value" style="font-size:1.4rem">
-        ${topGenre ? escapeHTML(topGenre[0]) : '–'}
-      </span>
-      <span class="stat-card-sub">
-        ${topGenre ? `${topGenre[1]} reseña${topGenre[1] > 1 ? 's' : ''}` : 'sin datos'}
-      </span>
-    </div>
-
-    <div class="stat-card">
-      <span class="stat-card-icon">🏆</span>
-      <span class="stat-card-label">Mejor calificada</span>
-      <span class="stat-card-value" style="font-size:1.2rem">
-        ${highestRated ? escapeHTML(highestRated.movieTitle || highestRated.title || '–') : '–'}
-      </span>
-      <span class="stat-card-sub">
-        ${highestRated ? `⭐ ${highestRated.rating}/10` : 'sin datos'}
-      </span>
-    </div>
-
-    ${sessionHTML}
   `;
+
+  container.innerHTML = summaryCards + distHTML + genreHTML + sessionCardsHTML;
 }
 
 /**
