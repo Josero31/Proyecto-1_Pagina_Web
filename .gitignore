@@ -13,6 +13,9 @@ desktop.ini
 *.swo
 *~
 
+# API Keys / configuración sensible
+js/config.js
+
 # Variables de entorno
 .env
 .env.local

@@ -1,17 +1,18 @@
 /* ═══════════════════════════════════════════════════════════
-   config.js — Configuración global de la aplicación
+   config.example.js — Plantilla de configuración
    ─────────────────────────────────────────────────────────
-   IMPORTANTE: Reemplaza TMDB_API_KEY con tu clave personal.
+   1. Copia este archivo y renómbralo a config.js
+   2. Reemplaza TMDB_API_KEY con tu clave personal.
    Regístrate gratis en: https://www.themoviedb.org/signup
    Luego: Perfil → Settings → API → Create API Key (v3 auth)
 ═══════════════════════════════════════════════════════════ */
 
 // ── TMDB (The Movie Database) ───────────────────────────
-export const TMDB_API_KEY   = 'c34488c2a67203a7c59b0ab5c4d48f38';
+export const TMDB_API_KEY   = 'PEGA_TU_API_KEY_AQUI';
 export const TMDB_BASE_URL  = 'https://api.themoviedb.org/3';
 export const TMDB_IMAGE_W500  = 'https://image.tmdb.org/t/p/w500';
 export const TMDB_IMAGE_W1280 = 'https://image.tmdb.org/t/p/w1280';
-export const TMDB_LANGUAGE  = 'es-ES';   // respuestas en español
+export const TMDB_LANGUAGE  = 'es-ES';
 
 // Imagen de reemplazo cuando no hay poster
 export const IMG_PLACEHOLDER =
@@ -21,6 +22,4 @@ export const IMG_PLACEHOLDER =
 export const DUMMY_BASE_URL = 'https://dummyjson.com';
 
 // ── Paginación ──────────────────────────────────────────
-// TMDB devuelve 20 resultados por página por defecto
-// El máximo de páginas que TMDB permite consultar es 500
 export const MAX_TMDB_PAGES = 500;
