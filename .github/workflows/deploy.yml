@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Crear config.js desde Secret
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: |
+          {
+            echo "export const TMDB_API_KEY = '${TMDB_API_KEY}';"
+            echo "export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';"
+            echo "export const TMDB_IMAGE_W500 = 'https://image.tmdb.org/t/p/w500';"
+            echo "export const TMDB_IMAGE_W1280 = 'https://image.tmdb.org/t/p/w1280';"
+            echo "export const TMDB_LANGUAGE = 'es-ES';"
+            echo "export const IMG_PLACEHOLDER = 'https://via.placeholder.com/500x750/1f1f1f/555555?text=Sin+Imagen';"
+            echo "export const DUMMY_BASE_URL = 'https://dummyjson.com';"
+            echo "export const MAX_TMDB_PAGES = 500;"
+          } > js/config.js
+
+      - uses: actions/configure-pages@v4
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
