@@ -1,56 +1,123 @@
-# CineReview — Blog de Películas y Series
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-Blog CRUD completo construido con HTML5, CSS3 y JavaScript ES2022+ (Vanilla, sin frameworks).
+<div align="center">
+  <h3 align="center">CineReview — Blog de Películas y Series</h3>
 
-## Descripción
+  <p align="center">
+    Un blog CRUD completo para descubrir películas, leer detalles y gestionar reseñas, construido con HTML5, CSS3 y JavaScript Vanilla.
+    <br />
+    <a href="#"><strong>Explorar la documentación »</strong></a>
+    <br />
+    <br />
+    <a href="#">Ver Demo</a>
+    ·
+    <a href="https://github.com/Josero31/Proyecto-1_Pagina_Web/issues">Reportar Bug</a>
+    ·
+    <a href="https://github.com/Josero31/Proyecto-1_Pagina_Web/issues">Solicitar Feature</a>
+  </p>
+</div>
 
-CineReview permite descubrir películas y series, leer sus detalles y gestionar reseñas completas con calificación, género y contenido. Implementa las cuatro operaciones CRUD sobre una API REST real.
+---
 
-## API utilizada
+## Tabla de Contenidos
 
-**The Movie Database (TMDB)** — `https://api.themoviedb.org/3`
-- GET `/movie/popular` — Listado paginado de películas populares
-- GET `/movie/{id}` — Detalle completo de una película
-- GET `/search/movie` — Búsqueda por texto
-- GET `/discover/movie` — Filtros por género, año y ordenamiento
-- GET `/genre/movie/list` — Lista de géneros disponibles
+1. [Sobre el Proyecto](#sobre-el-proyecto)
+   - [Construido Con](#construido-con)
+2. [Comenzando](#comenzando)
+   - [Prerequisitos](#prerequisitos)
+   - [Instalación](#instalación)
+3. [Uso](#uso)
+4. [Funcionalidades](#funcionalidades)
+5. [Estructura del Proyecto](#estructura-del-proyecto)
+6. [Contribuir](#contribuir)
+7. [Licencia](#licencia)
+8. [Contacto](#contacto)
+9. [Agradecimientos](#agradecimientos)
 
-**DummyJSON** — `https://dummyjson.com/posts` (reseñas CRUD simuladas)
-- POST `/posts/add` — Crear reseña
-- PUT `/posts/{id}` — Editar reseña
-- DELETE `/posts/{id}` — Eliminar reseña
+---
 
-## Instrucciones de uso
+## Sobre el Proyecto
 
-### 1. Obtener API Key de TMDB (gratis)
+CineReview es un blog interactivo que permite descubrir películas y series, leer sus detalles y gestionar reseñas completas con calificación, género y contenido. Implementa las cuatro operaciones CRUD sobre APIs REST reales.
 
-1. Crear cuenta en [themoviedb.org](https://www.themoviedb.org/signup)
-2. Ir a **Perfil → Settings → API → Create API Key**
-3. Elegir "Developer" y completar el formulario
-4. Copiar la **API Key (v3 auth)**
+Por qué CineReview:
+* Consume datos reales de **The Movie Database (TMDB)** con paginación, búsqueda y filtros
+* Gestión completa de reseñas (crear, leer, editar y eliminar) contra **DummyJSON**
+* Estadísticas dinámicas de sesión: promedio de calificaciones, género más reseñado y más
 
-### 2. Configurar la API Key
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
-Abrir `js/config.js` y reemplazar:
+### Construido Con
 
-```js
-export const TMDB_API_KEY = 'PEGA_TU_API_KEY_AQUI';
-```
+* [![HTML5][HTML5-badge]][HTML5-url]
+* [![CSS3][CSS3-badge]][CSS3-url]
+* [![JavaScript][JS-badge]][JS-url]
+* [![TMDB][TMDB-badge]][TMDB-url]
 
-### 3. Ejecutar el proyecto
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
-El proyecto usa ES Modules (`type="module"`), por lo que **no puede abrirse directamente con doble clic**. Necesita un servidor HTTP local.
+---
 
-**Opción A — VS Code (recomendado):**
-Instalar la extensión **Live Server** y hacer clic en "Go Live".
+## Comenzando
 
-**Opción B — Python:**
-```bash
-python -m http.server 5500
-```
-Luego abrir `http://localhost:5500`
+### Prerequisitos
 
-## Funcionalidades implementadas
+No se requieren dependencias externas ni gestores de paquetes. Solo necesitas:
+- Un navegador moderno con soporte para ES Modules
+- Un servidor HTTP local (el proyecto **no puede abrirse con doble clic** debido a `type="module"`)
+
+### Instalación
+
+1. Obtén una API Key **gratuita** en [themoviedb.org](https://www.themoviedb.org/signup)
+   - Ir a **Perfil → Settings → API → Create API Key**
+   - Elegir "Developer" y copiar la **API Key (v3 auth)**
+
+2. Clona el repositorio
+   ```sh
+   git clone https://github.com/Josero31/Proyecto-1_Pagina_Web.git
+   ```
+
+3. Configura tu API Key en `js/config.js`
+   ```js
+   export const TMDB_API_KEY = 'PEGA_TU_API_KEY_AQUI';
+   ```
+
+4. Levanta un servidor local
+
+   **Opción A — VS Code (recomendado):**
+   Instala la extensión **Live Server** y haz clic en "Go Live".
+
+   **Opción B — Python:**
+   ```sh
+   python -m http.server 5500
+   ```
+   Luego abre `http://localhost:5500`
+
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Uso
+
+CineReview se divide en varias vistas:
+
+- **Inicio:** listado paginado de películas populares con skeleton loader
+- **Detalle:** información completa de una película (título, sinopsis, géneros, calificación, etc.)
+- **Reseñas:** formulario para crear, editar y eliminar reseñas con validación en tiempo real
+- **Búsqueda y filtros:** busca por texto, filtra por género y año con ordenamiento
+- **Estadísticas:** resumen dinámico de la sesión (total de reseñas, promedio, género más reseñado, mejor calificada)
+
+_Para más detalles sobre la API, consulta la [documentación de TMDB](https://developer.themoviedb.org/docs)._
+
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Funcionalidades
 
 | RF | Descripción | Estado |
 |----|-------------|--------|
@@ -63,47 +130,102 @@ Luego abrir `http://localhost:5500`
 | RF-07 | Skeleton, toast, error, estado vacío | ✅ |
 | RF-08 | Navegación clara + sección de Estadísticas | ✅ |
 
-## Estructura del proyecto
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Estructura del Proyecto
 
 ```
-proyecto-blog/
+Proyecto-1_Pagina_Web/
 ├── index.html
 ├── .gitignore
 ├── README.md
 ├── css/
-│   ├── main.css         ← variables, reset, utilidades
-│   ├── layout.css       ← navbar, hero, filtros, footer
-│   └── components.css   ← cards, botones, forms, skeleton, toasts
+│   ├── main.css          ← variables, reset, utilidades
+│   ├── layout.css        ← navbar, hero, filtros, footer
+│   └── components.css    ← cards, botones, forms, skeleton, toasts
 └── js/
-    ├── config.js        ← URLs y claves de API
-    ├── state.js         ← estado global compartido
-    ├── api.js           ← todas las funciones fetch
-    ├── ui.js            ← funciones que manipulan el DOM
-    ├── validation.js    ← validaciones de formularios
-    ├── router.js        ← navegación entre vistas
-    └── main.js          ← punto de entrada e inicialización
+    ├── config.js         ← URLs y claves de API
+    ├── state.js          ← estado global compartido
+    ├── api.js            ← todas las funciones fetch
+    ├── ui.js             ← funciones que manipulan el DOM
+    ├── validation.js     ← validaciones de formularios
+    ├── router.js         ← navegación entre vistas
+    └── main.js           ← punto de entrada e inicialización
 ```
 
-## Sección adicional — Estadísticas
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
-La sección **Estadísticas** muestra un resumen de la actividad de la sesión:
-- Total de reseñas escritas
-- Calificación promedio
-- Género más reseñado
-- Película mejor calificada
+---
 
-Esta sección es dinámica y se actualiza en tiempo real con cada reseña creada o eliminada.
+## Contribuir
 
-## Integrantes
+Las contribuciones hacen que la comunidad open source sea un lugar increíble para aprender, inspirar y crear. Cualquier contribución es **muy apreciada**.
 
-- [Nombre Integrante 1]
-- [Nombre Integrante 2]
+Si tienes alguna sugerencia para mejorar el proyecto, haz un fork del repositorio y crea un pull request, o abre un issue con la etiqueta "enhancement". ¡No olvides darle una estrella al proyecto!
 
-## Despliegue
+1. Haz un Fork del proyecto
+2. Crea tu rama de feature (`git checkout -b feature/AmazingFeature`)
+3. Haz commit de tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Haz Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-Disponible en: [URL de GitHub Pages / Netlify]
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Licencia
+
+Distribuido bajo la Licencia MIT. Ver `LICENSE.txt` para más información.
+
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Contacto
+
+Jose Sanchez — [GitHub](https://github.com/Josero31)
+
+Link del proyecto: [https://github.com/Josero31/Proyecto-1_Pagina_Web](https://github.com/Josero31/Proyecto-1_Pagina_Web)
+
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
+
+---
+
+## Agradecimientos
+
+* [The Movie Database (TMDB)](https://www.themoviedb.org) — API de datos de películas
+* [DummyJSON](https://dummyjson.com) — API REST simulada para reseñas
+* [Shields.io](https://shields.io) — Badges del README
+* [Best-README-Template](https://github.com/othneildrew/Best-README-Template) — Estructura de este README
+* [Live Server — VS Code](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
+* [Font Awesome](https://fontawesome.com)
+
+<p align="right">(<a href="#tabla-de-contenidos">volver arriba</a>)</p>
 
 ---
 
 > Datos de películas provistos por [The Movie Database (TMDB)](https://www.themoviedb.org).
 > Este producto usa la API de TMDB pero no está respaldado ni certificado por TMDB.
+
+<!-- MARKDOWN LINKS & BADGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/Josero31/Proyecto-1_Pagina_Web.svg?style=for-the-badge
+[contributors-url]: https://github.com/Josero31/Proyecto-1_Pagina_Web/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/Josero31/Proyecto-1_Pagina_Web.svg?style=for-the-badge
+[forks-url]: https://github.com/Josero31/Proyecto-1_Pagina_Web/network/members
+[stars-shield]: https://img.shields.io/github/stars/Josero31/Proyecto-1_Pagina_Web.svg?style=for-the-badge
+[stars-url]: https://github.com/Josero31/Proyecto-1_Pagina_Web/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Josero31/Proyecto-1_Pagina_Web.svg?style=for-the-badge
+[issues-url]: https://github.com/Josero31/Proyecto-1_Pagina_Web/issues
+[license-shield]: https://img.shields.io/github/license/Josero31/Proyecto-1_Pagina_Web.svg?style=for-the-badge
+[license-url]: https://github.com/Josero31/Proyecto-1_Pagina_Web/blob/main/LICENSE.txt
+
+[HTML5-badge]: https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white
+[HTML5-url]: https://developer.mozilla.org/es/docs/Web/HTML
+[CSS3-badge]: https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white
+[CSS3-url]: https://developer.mozilla.org/es/docs/Web/CSS
+[JS-badge]: https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black
+[JS-url]: https://developer.mozilla.org/es/docs/Web/JavaScript
+[TMDB-badge]: https://img.shields.io/badge/TMDB-01B4E4?style=for-the-badge&logo=themoviedatabase&logoColor=white
+[TMDB-url]: https://www.themoviedb.org
