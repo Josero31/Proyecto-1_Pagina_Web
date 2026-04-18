@@ -421,17 +421,18 @@ function setupEditForm() {
       });
 
       // Actualizar en el estado local sin recargar
+      const mergedReview = r => ({
+        ...r,
+        ...updated,
+        movieTitle: data.movieTitle,
+        author:     data.author,
+        rating:     Number(data.rating),
+        genre:      data.genre,
+      });
       const idx = state.reviews.findIndex(r => String(r.id) === String(id));
-      if (idx !== -1) {
-        state.reviews[idx] = {
-          ...state.reviews[idx],
-          ...updated,
-          movieTitle: data.movieTitle,
-          author:     data.author,
-          rating:     Number(data.rating),
-          genre:      data.genre,
-        };
-      }
+      if (idx !== -1) state.reviews[idx] = mergedReview(state.reviews[idx]);
+      const sidx = state.sessionReviews.findIndex(r => String(r.id) === String(id));
+      if (sidx !== -1) state.sessionReviews[sidx] = mergedReview(state.sessionReviews[sidx]);
 
       showToast('Reseña actualizada correctamente. ✏️', 'success');
       clearErrors('edit');
@@ -484,7 +485,8 @@ function setupConfirmModal() {
       await deleteReview(id);
 
       // Remover del estado local
-      state.reviews = state.reviews.filter(r => String(r.id) !== String(id));
+      state.reviews        = state.reviews.filter(r => String(r.id) !== String(id));
+      state.sessionReviews = state.sessionReviews.filter(r => String(r.id) !== String(id));
 
       // Remover la tarjeta del DOM con animación
       const card = document.querySelector(`.review-card[data-review-id="${id}"]`);

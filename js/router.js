@@ -177,13 +177,20 @@ export async function loadDetailView(movieId) {
   }
 }
 
+function normalizePosts(posts) {
+  return posts.map(r => ({
+    ...r,
+    rating: r.rating != null ? r.rating : ((r.id % 6) + 5),
+  }));
+}
+
 /**
  * Carga y muestra las reseñas en la sección del detalle.
  */
 async function loadReviewsForDetail() {
   try {
     const data = await getReviews();
-    state.reviews = data.posts || [];
+    state.reviews = normalizePosts(data.posts || []);
     renderReviews(state.reviews);
     attachReviewEvents();
   } catch {
@@ -206,7 +213,7 @@ async function loadStatsView() {
     // Si no hay reseñas cargadas aún (usuario fue directo a Stats), cargarlas
     if (state.reviews.length === 0) {
       const data   = await getReviews();
-      state.reviews = data.posts || [];
+      state.reviews = normalizePosts(data.posts || []);
     }
     renderStats(state.reviews, state.sessionReviews);
   } catch (error) {
