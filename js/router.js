@@ -26,6 +26,7 @@ import {
   showEmptyState,
   showStatsError,
   setActiveNavLink,
+  showToast,
 } from './ui.js';
 
 import { state } from './state.js';
@@ -66,18 +67,25 @@ export function navigateTo(view, params = {}) {
   // Cargar contenido según la vista
   switch (view) {
     case 'home':
+      state.currentMovieTitle = null;
       loadHomeView();
       break;
 
     case 'detail':
       if (params.movieId) {
-        state.currentMovieId = params.movieId;
+        state.currentMovieId    = params.movieId;
+        state.currentMovieTitle = params.movieTitle || null;
         loadDetailView(params.movieId);
       }
       break;
 
     case 'create':
-      // El formulario ya está en el HTML; main.js gestiona el submit
+      if (!state.currentMovieTitle) {
+        showToast('Selecciona una película primero y haz clic en "Escribir Reseña".', 'error');
+        navigateTo('home');
+        return;
+      }
+      prefillCreateMovieTitle(state.currentMovieTitle);
       break;
 
     case 'edit':
@@ -157,6 +165,7 @@ export async function loadDetailView(movieId) {
   try {
     // GET por ID (segundo GET requerido por RT-03)
     const movie = await getMovieById(movieId);
+    state.currentMovieTitle = movie.title || null;
     renderMovieDetail(movie);
 
     // Cargar reseñas (GET /posts)
@@ -218,6 +227,26 @@ async function loadStatsView() {
     renderStats(state.reviews, state.sessionReviews);
   } catch (error) {
     showStatsError(`No se pudieron cargar las estadísticas: ${error.message}`);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   prefillCreateMovieTitle — Pre-carga título en formulario crear
+────────────────────────────────────────────────────────── */
+
+function prefillCreateMovieTitle(title) {
+  const input = document.getElementById('create-movie-title');
+  if (!input) return;
+  if (title) {
+    input.value    = title;
+    input.readOnly = true;
+    input.style.opacity = '0.7';
+    input.style.cursor  = 'not-allowed';
+  } else {
+    input.value    = '';
+    input.readOnly = false;
+    input.style.opacity = '';
+    input.style.cursor  = '';
   }
 }
 

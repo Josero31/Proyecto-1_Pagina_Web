@@ -7,7 +7,8 @@
 export const state = {
   // ── Navegación ──────────────────────────────────────
   currentView:    'home',   // 'home' | 'detail' | 'create' | 'edit' | 'stats'
-  currentMovieId: null,     // ID de la película en vista de detalle
+  currentMovieId:    null,  // ID de la película en vista de detalle
+  currentMovieTitle: null,  // Título de la película en vista de detalle
 
   // ── Paginación ──────────────────────────────────────
   currentPage:  1,
